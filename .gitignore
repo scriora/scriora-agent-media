@@ -1,0 +1,30 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build
+dist/
+build/
+.turbo/
+*.tsbuildinfo
+
+# Generated media (keep fixtures/)
+tmp/
+.cache/
+*.tmp
+
+# Test
+coverage/
+
+# Secrets
+.env
+.env.*
+!.env.example
+*.pem
+
+# Logs / OS / IDE
+*.log
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

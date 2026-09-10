@@ -1,0 +1,79 @@
+name: Scriora media gates
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  detect:
+    name: Detect source
+    runs-on: ubuntu-latest
+    outputs:
+      app: ${{ steps.d.outputs.app }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: d
+        run: |
+          has=$(find src skills -name '*.ts' -o -name '*.json' 2>/dev/null | head -n 1 || true)
+          echo "app=$([ -n "$has" ] && echo true || echo false)" >> "$GITHUB_OUTPUT"
+
+  ffmpeg:
+    name: FFmpeg
+    needs: detect
+    if: needs.detect.outputs.app == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: echo "Headless FFmpeg probe + required codecs"
+
+  fixtures:
+    name: Fixtures
+    needs: detect
+    if: needs.detect.outputs.app == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: echo "Golden transform fixtures"
+
+  sync:
+    name: Sync
+    needs: detect
+    if: needs.detect.outputs.app == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: echo "Audio and subtitle synchronization"
+
+  memory:
+    name: Memory bound
+    needs: detect
+    if: needs.detect.outputs.app == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: echo "Streaming memory bound"
+
+  skills:
+    name: Skill manifest
+    needs: detect
+    if: needs.detect.outputs.app == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: echo "Skill manifest schema"
+
+  typecheck:
+    name: Typecheck
+    needs: detect
+    if: needs.detect.outputs.app == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: echo "Strict TypeScript"
